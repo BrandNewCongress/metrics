@@ -1,6 +1,6 @@
 import './App.css'
 import React, { Component } from 'react'
-import { Button, DatePicker, Layout, Menu, Select, Table } from 'antd'
+import { Button, Card, DatePicker, Layout, Menu, Select, Table } from 'antd'
 import request from 'superagent'
 
 const { RangePicker } = DatePicker
@@ -19,11 +19,13 @@ export default class App extends Component {
   state = {
     dateRange: [],
     round: 'R1',
+    source: 'All',
+    evaluators: [],
     data: {},
     err: null,
     loading: false,
-    evaluators: [],
-    evaluatorOptions: []
+    evaluatorOptions: [],
+    displaySource: 'All'
   }
 
   queryState = () => {
@@ -31,6 +33,9 @@ export default class App extends Component {
       round: this.state.round,
       dateRange: this.state.dateRange.map(mom => mom.toDate().toDateString()),
     }
+
+    if (this.state.source && this.state.source !== 'All')
+      query.source = this.state.source
 
     if (this.state.evaluators.length > 0)
       query.evaluators = this.state.evaluators
@@ -54,7 +59,11 @@ export default class App extends Component {
     .query(this.queryState())
     .end((err, res) => err
       ? this.setState({err, loading: false})
-      : this.setState({data: res.body, loading: false})
+      : this.setState({
+          data: res.body,
+          loading: false,
+          displaySource: this.state.source
+        })
     )
   }
 
@@ -64,7 +73,8 @@ export default class App extends Component {
 
   render () {
     const {
-      dateRange, round, loading, data, evaluators, evaluatorOptions
+      dateRange, round, loading, data, evaluators, evaluatorOptions,
+      source, displaySource
     } = this.state
 
     const tableStyle = {
@@ -109,6 +119,17 @@ export default class App extends Component {
             ))}
           </Select>
 
+          <Select value={source}
+            style={{ width: 120 }}
+            onChange={this.mutate('source')}
+          >
+            <Option key='Justice Democrats Website'>JD</Option>
+            <Option key='BNC Website'>BNC</Option>
+            <Option key='Research'>Research</Option>
+            <Option key='Personal Contact'>Personal Contact</Option>
+            <Option key='Nominator Call'>Nominator Call</Option>
+          </Select>
+
           <Button type='primary' onClick={this.go} loading={loading} >
             Go
           </Button>
@@ -117,6 +138,10 @@ export default class App extends Component {
           {Object.keys(data).length > 0
             ? (
                 <div>
+                  <Card title={`${data.nominations} nominations from ${displaySource}`}
+                    bodyStyle={{height: 0, padding: 0}}
+                  />
+
                   <div style={tableStyle}>
                     <Table columns={Object.keys(data.breakdown).map(b => ({
                         title: b.toUpperCase(),
