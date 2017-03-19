@@ -6,12 +6,16 @@ export default class MyTable extends Component {
     const { data, label } = this.props
 
     return (
-      <Table columns={Object.keys(data).map(k => ({
-          title: k.toUpperCase(),
-          key: k,
-          dataIndex: k
-        }))}
-        dataSource={[data]}
+      <Table columns={[{
+          title: 'Value',
+          key: 'value',
+          dataIndex: 'value'
+        }, {
+          title: 'Count',
+          key: 'count',
+          dataIndex: 'count',
+        }]}
+        dataSource={Object.entries(data).map(([value, count]) => ({value, count}))}
         pagination={false}
         title={() => label}
         size='middle'
