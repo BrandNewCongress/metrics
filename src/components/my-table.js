@@ -15,7 +15,10 @@ export default class MyTable extends Component {
           key: 'count',
           dataIndex: 'count',
         }]}
-        dataSource={Object.entries(data).map(([value, count]) => ({value, count}))}
+        dataSource={Object.entries(data)
+          .sort((a,b) => b[1] - a[1])
+          .map(([value, count]) => ({value, count}))
+        }
         pagination={false}
         title={() => label}
         size='middle'
