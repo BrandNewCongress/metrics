@@ -1,4 +1,4 @@
-import './App.css'
+import './app.css'
 import React, { Component } from 'react'
 import { Button, Card, DatePicker, Layout, Menu, Select, Table } from 'antd'
 import request from 'superagent'
@@ -6,6 +6,8 @@ import request from 'superagent'
 const { RangePicker } = DatePicker
 const { Header, Content } = Layout
 const { Option } = Select
+
+import MyTable from './components/my-table'
 
 /*
  * TODO - disallow future date selection
@@ -143,43 +145,24 @@ export default class App extends Component {
                   />
 
                   <div style={tableStyle}>
-                    <Table columns={Object.keys(data.breakdown).map(b => ({
-                        title: b.toUpperCase(),
-                        key: b,
-                        dataIndex: b
-                      }))}
-                      dataSource={[data.breakdown]}
-                      pagination={false}
-                      title={() => 'Breakdown of Results'}
-                      size='middle'
-                    />
+                    <MyTable data={data.breakdown} label='Breakdown' />
                   </div>
 
                   <div style={tableStyle}>
-                    <Table columns={Object.keys(data.gender).map(g => ({
-                        title: g.toUpperCase(),
-                        key: g,
-                        dataIndex: g
-                      }))}
-                      dataSource={[data.gender]}
-                      pagination={false}
-                      title={() => 'Gender Breakdown of Yes\'s'}
-                      size='middle'
-                    />
+                    <MyTable data={data.gender} label={`Gender Breakdown of Yes's`} />
                   </div>
 
                   <div style={tableStyle}>
-                    <Table columns={Object.keys(data.race).map(r => ({
-                        title: r.toUpperCase(),
-                        key: r,
-                        dataIndex: r
-                      }))}
-                      dataSource={[data.race]}
-                      pagination={false}
-                      title={() => 'Race Breakdown of Yes\'s'}
-                      size='middle'
-                    />
+                    <MyTable data={data.race} label={`Race Breakdown of Yes\'s`} />
                   </div>
+
+                  {round == 'R2' && (
+                    <div>
+                      <div style={tableStyle}>
+                        {/* <MyTable data={data.tickets} label='Race Breakdown of Yes\'s' /> */}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )
             : false

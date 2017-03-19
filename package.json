@@ -6,7 +6,8 @@
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-scripts": "0.9.5",
-    "superagent": "^3.5.0"
+    "superagent": "^3.5.0",
+    "to-space-case": "^1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
