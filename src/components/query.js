@@ -25,19 +25,27 @@ export default class Query extends Component {
     linkedModelOptions: [],
     secondaryAttributeOptions: [],
     dateRange: [],
-    loading: false
+    loading: false,
+    filterBy: null,
+    filterVal: [],
+    filterOptions: []
   }
 
   go = () => {
     this.setState({loading: true})
 
     const {
-      operation, model, attribute, secondaryAttribute
+      operation, model, attribute, secondaryAttribute, filterBy, filterVal
     } = this.state
 
     const dateRange = this.state.dateRange.map(m => m.toDate().toString())
 
-    const query = { operation, model, attribute, secondaryAttribute, dateRange }
+    const query = Object.assign(
+      { operation, model, attribute, secondaryAttribute, dateRange },
+      filterBy
+        ? {[filterBy]: filterVal}
+        : {}
+    )
 
     request.get(window.API_ENDPOINT + '/query')
       .query(query)
@@ -72,6 +80,10 @@ export default class Query extends Component {
       }
     }
 
+    if (attr == 'filterBy') {
+      this.askForValues(this.state.model, val)
+    }
+
     this.forceUpdate()
   }
 
@@ -89,10 +101,18 @@ export default class Query extends Component {
           })
     )
 
+  askForValues = (model, attribute) => request.get(window.API_ENDPOINT + '/attribute-options')
+    .query({model, attribute})
+    .end((err, res) => err
+      ? this.setState({err})
+      : this.setState({filterOptions: res.body})
+    )
+
   render () {
     const {
       operation, model, attribute, dateRange, loading, secondaryAttribute,
-      attributeOptions, linkedModelOptions, secondaryAttributeOptions
+      attributeOptions, linkedModelOptions, secondaryAttributeOptions,
+      filterBy, filterOptions, filterVal
     } = this.state
 
 
@@ -186,11 +206,36 @@ export default class Query extends Component {
             )
           : null
         }
+
         {dateRange.length == 2 && (
           <Button type='primary' onClick={this.go} loading={loading} >
             Go
           </Button>
         )}
+
+        {dateRange.length == 2 && (
+          <div style={{color: 'white', ...itemStyle}}>
+            including only where
+            <Select style={{width: 200, ...itemStyle}}
+              onChange={this.mutate('filterBy')}
+              value={filterBy}
+            >
+              {attributeOptions.map(o => (
+                <Option value={o}>{toSpaceCase(o)}</Option>
+              ))}
+            </Select>
+            is one of
+            <Select multiple style={{width: 200, ...itemStyle}}
+              onChange={this.mutate('filterVal')}
+              value={filterVal}
+            >
+              {filterOptions.map(o => (
+                <Option value={o}>{o}</Option>
+              ))}
+            </Select>
+          </div>
+        )}
+
       </div>
     )
   }
